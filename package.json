@@ -4,7 +4,8 @@
   "description": "A 3D web implementation of the famous board game",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack --progress"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,16 @@
   "bugs": {
     "url": "https://github.com/PhilippeMorier/TheSettlersOfCatan/issues"
   },
-  "homepage": "https://github.com/PhilippeMorier/TheSettlersOfCatan#readme"
+  "homepage": "https://github.com/PhilippeMorier/TheSettlersOfCatan#readme",
+  "devDependencies": {
+    "@types/babylonjs": "2.3.31",
+    "html-loader": "0.4.4",
+    "html-webpack-plugin": "2.26.0",
+    "ts-loader": "1.3.3",
+    "typescript": "2.1.4",
+    "webpack": "2.2.0-rc.3"
+  },
+  "dependencies": {
+    "babylonjs": "2.3.0"
+  }
 }
