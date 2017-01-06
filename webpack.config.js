@@ -4,13 +4,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: {
         'app': [
-            './app.ts'
+            './src/app.ts'
         ]
     },
 
     output: {
         path: './dist',
         filename: '[name].[hash].js'
+    },
+
+    resolve: {
+        extensions: ['.js', '.ts']
     },
 
     module: {
