@@ -10,7 +10,7 @@ module.exports = {
 
     output: {
         path: './dist',
-        filename: '[name].[hash].js'
+        filename: '[name].js'
     },
 
     resolve: {

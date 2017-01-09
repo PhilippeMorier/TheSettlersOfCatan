@@ -16,7 +16,7 @@ import {
     VertexData
 } from 'babylonjs/babylon.max';
 
-import { GreedyMesh } from './greedyMesher';
+import { GreedyMesher } from './greedyMesher';
 
 export class Game {
     private engine: BABYLON.Engine;
@@ -53,31 +53,17 @@ export class Game {
     }
 
     public createScene(): void {
-        // this.scene = new Scene(this.engine);
-        // this.scene.gravity = new Vector3(0,-0.5,0);
-        // this.scene.clearColor = new Color3(0.7,0.7,0.7);
-        //
-        // this.camera = new FreeCamera('camera1', new Vector3(0, 5, -10), this.scene);
-        // this.camera.setTarget(Vector3.Zero());
-        // this.camera.attachControl(this.canvas, false);
-        // this.light = new HemisphericLight('light1', new Vector3(0, 1, 0), this.scene);
-
         this.scene = new Scene(this.engine);
         this.scene.gravity = new Vector3(0,-0.5,0);
         this.scene.clearColor = new Color3(0.7,0.7,0.7);
-        this.camera = new FreeCamera("camera1", new Vector3(-5, -5, -5), this.scene);
 
+        this.camera = new FreeCamera('camera1', new Vector3(0, 5, -10), this.scene);
         this.camera.setTarget(Vector3.Zero());
-
         this.camera.attachControl(this.canvas, false);
-
-        var light0 = new HemisphericLight("Hemi0", new Vector3(0, 1, 0), this.scene);
-        light0.diffuse = new Color3(1.2, 1.2, 1.2);
-        light0.specular = new Color3(0.2, 0.2, 0.2);
-        light0.groundColor = new Color3(0.2, 0.2, 0.2);
+        this.light = new HemisphericLight('light1', new Vector3(0, 1, 0), this.scene);
 
         // http://babylonjsguide.github.io/advanced/Custom
-        let result = GreedyMesh(this.voxelData.voxels, this.voxelData.dims);
+        let result = GreedyMesher.createMesh(this.voxelData.voxels, this.voxelData.dims);
 
         let blankmesh: BABYLON.Mesh = new Mesh('blank', this.scene);
         blankmesh.position = Vector3.Zero();
