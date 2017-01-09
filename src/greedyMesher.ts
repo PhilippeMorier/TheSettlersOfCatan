@@ -1,7 +1,7 @@
 export class GreedyMesher {
     private static mask: Int32Array = new Int32Array(4096);
 
-    public static createMesh(volume: Int32Array, dims: number[]): {vertices: number[][], faces: number[][]} {
+    public static createMeshData(volume: Int32Array, dims: number[]): {vertices: number[][], faces: number[][]} {
         function getAt(i, j, k) {
             return volume[i + dims[0] * (j + dims[1] * k)];
         }
