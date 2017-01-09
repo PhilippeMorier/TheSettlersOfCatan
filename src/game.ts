@@ -25,20 +25,7 @@ export class Game {
     private light: BABYLON.Light;
     private standardMaterial: BABYLON.StandardMaterial;
 
-    private makeVoxels(l, h, f): {voxels: Int32Array; dims: number[]} {
-        let d = [h[0] - l[0], h[1] - l[1], h[2] - l[2]]
-            , v = new Int32Array(d[0] * d[1] * d[2])
-            , n = 0;
-        for (let k = l[2]; k < h[2]; ++k)
-            for (let j = l[1]; j < h[1]; ++j)
-                for (let i = l[0]; i < h[0]; ++i, ++n) {
-                    v[n] = f(i, j, k);
-                }
-
-        return {voxels: v, dims: d};
-    }
-
-    constructor(private canvas: HTMLCanvasElement) {
+    public constructor(private canvas: HTMLCanvasElement) {
         this.engine = new Engine(this.canvas, true);
     }
 
@@ -62,6 +49,44 @@ export class Game {
             return 0xeedd00;
         });
         this.createMesh(voxelData);
+    }
+
+    public run(): void {
+        this.engine.runRenderLoop(() => {
+            this.standardMaterial.wireframe = true;
+            this.standardMaterial.backFaceCulling = true;
+            this.scene.render();
+        });
+
+        window.addEventListener('resize', () => {
+            this.engine.resize();
+        });
+    }
+
+    public hexToRGB(hexStr): any {
+        let R = parseInt((this.trimHex(hexStr)).substring(0, 2), 16);
+        let G = parseInt((this.trimHex(hexStr)).substring(2, 4), 16);
+        let B = parseInt((this.trimHex(hexStr)).substring(4, 6), 16);
+        let A = 1;
+
+        return [R / 255, G / 255, B / 255, A];
+    }
+
+    public trimHex(h) {
+        return (h.charAt(0) == "#") ? h.substring(1, 7) : h;
+    }
+
+    private makeVoxels(l, h, f): {voxels: Int32Array; dims: number[]} {
+        let d = [h[0] - l[0], h[1] - l[1], h[2] - l[2]]
+            , v = new Int32Array(d[0] * d[1] * d[2])
+            , n = 0;
+        for (let k = l[2]; k < h[2]; ++k)
+            for (let j = l[1]; j < h[1]; ++j)
+                for (let i = l[0]; i < h[0]; ++i, ++n) {
+                    v[n] = f(i, j, k);
+                }
+
+        return {voxels: v, dims: d};
     }
 
     private createMesh(voxelData: {voxels: Int32Array; dims: number[]}) {
@@ -108,30 +133,5 @@ export class Game {
         vertexData.applyToMesh(voxelMesh, true);
         // blankmesh._updateBoundingInfo();
         voxelMesh.checkCollisions = true;
-    }
-
-    public run(): void {
-        this.engine.runRenderLoop(() => {
-            this.standardMaterial.wireframe = true;
-            this.standardMaterial.backFaceCulling = true;
-            this.scene.render();
-        });
-
-        window.addEventListener('resize', () => {
-            this.engine.resize();
-        });
-    }
-
-    public hexToRGB(hexStr): any {
-        let R = parseInt((this.trimHex(hexStr)).substring(0, 2), 16);
-        let G = parseInt((this.trimHex(hexStr)).substring(2, 4), 16);
-        let B = parseInt((this.trimHex(hexStr)).substring(4, 6), 16);
-        let A = 1;
-
-        return [R / 255, G / 255, B / 255, A];
-    }
-
-    public trimHex(h) {
-        return (h.charAt(0) == "#") ? h.substring(1, 7) : h;
     }
 }
