@@ -14,7 +14,9 @@ import {
     VertexData
 } from 'babylonjs/babylon.max';
 
+import FastSimplexNoise from './fastSimplexNoise';
 import { GreedyMesher } from './greedyMesher';
+import { Options } from './fastSimplexNoise';
 
 export class Game {
     private engine: BABYLON.Engine;
@@ -22,6 +24,7 @@ export class Game {
     private camera: BABYLON.FreeCamera;
     private light: BABYLON.Light;
     private standardMaterial: BABYLON.StandardMaterial;
+    private simplexNoise: FastSimplexNoise = new FastSimplexNoise({amplitude: 4, frequency: 0.03, persistence: 0.25} as Options);
 
     public constructor(private canvas: HTMLCanvasElement) {
         this.engine = new Engine(this.canvas, true);
@@ -32,26 +35,23 @@ export class Game {
         this.scene.gravity = new Vector3(0, -0.5, 0);
         this.scene.clearColor = new Color3(0.7, 0.7, 0.7);
 
-        this.camera = new FreeCamera('camera1', new Vector3(0, 5, -10), this.scene);
+        this.camera = new FreeCamera('camera1', new Vector3(0, 50, -100), this.scene);
         this.camera.setTarget(Vector3.Zero());
         this.camera.attachControl(this.canvas, false);
         this.light = new HemisphericLight('light1', new Vector3(0, 1, 0), this.scene);
 
-        let voxelData: {voxels: Int32Array; dims: number[]} = this.makeVoxels([0, 0, 0], [7, 7, 1], (i: number, j: number, k: number): number => {
-            if ((i === 2 && j === 1) ||
-                (i === 5 && j === 2) ||
-                (i === 1 && j === 4) ||
-                (i === 4 && j === 5)) {
-                return 0x00ff;
-            }
-            return 0xeedd00;
+        let voxelData: {voxels: Int32Array; dims: number[]} = this.makeVoxels([0, 0, 0], [30, 30, 30], (x: number, y: number, z: number): number => {
+            let noise: number = this.simplexNoise.scaled3D(x, y, z);
+
+            return (0.2 < noise) ? 255 : 0; // very slow when colors defined like: 0xff0000
         });
+
         this.createMesh(voxelData);
     }
 
     public run(): void {
         this.engine.runRenderLoop(() => {
-            this.standardMaterial.wireframe = true;
+            this.standardMaterial.wireframe = (document.getElementById('wireframe') as HTMLInputElement).checked;
             this.standardMaterial.backFaceCulling = true;
             this.scene.render();
         });
@@ -75,19 +75,19 @@ export class Game {
     }
 
     private makeVoxels(l: number[], h: number[], f: (i: number, j: number, k: number) => number): {voxels: Int32Array; dims: number[]} {
-        let d: number[] = [h[0] - l[0], h[1] - l[1], h[2] - l[2]];
-        let v: Int32Array = new Int32Array(d[0] * d[1] * d[2]);
+        let dimension: number[] = [h[0] - l[0], h[1] - l[1], h[2] - l[2]];
+        let voxels: Int32Array = new Int32Array(dimension[0] * dimension[1] * dimension[2]);
         let n: number = 0;
 
         for (let k: number = l[2]; k < h[2]; ++k) {
             for (let j: number = l[1]; j < h[1]; ++j) {
                 for (let i: number = l[0]; i < h[0]; ++i, ++n) {
-                    v[n] = f(i, j, k);
+                    voxels[n] = f(i, j, k);
                 }
             }
         }
 
-        return {voxels: v, dims: d};
+        return {voxels: voxels, dims: dimension};
     }
 
     private createMesh(voxelData: {voxels: Int32Array; dims: number[]}): void {
@@ -130,6 +130,9 @@ export class Game {
         vertexData.indices = tris;
         vertexData.normals = normals;
         vertexData.colors = colors;
+
+        console.log('vertices', vertices.length);
+        console.log('triangles', tris.length);
 
         vertexData.applyToMesh(voxelMesh, true);
         // blankmesh._updateBoundingInfo();
