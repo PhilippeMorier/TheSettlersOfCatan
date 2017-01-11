@@ -21,7 +21,7 @@ export interface Options {
     random?: () => number
 }
 
-export default class FastSimplexNoise {
+export class FastSimplexNoise {
     readonly amplitude: number;
     readonly frequency: number;
     readonly octaves: number;

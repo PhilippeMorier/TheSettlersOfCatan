@@ -14,9 +14,8 @@ import {
     VertexData
 } from 'babylonjs/babylon.max';
 
-import FastSimplexNoise from './fastSimplexNoise';
 import { GreedyMesher } from './greedyMesher';
-import { Options } from './fastSimplexNoise';
+import { FastSimplexNoise, Options } from './fastSimplexNoise';
 
 export class Game {
     private engine: BABYLON.Engine;
@@ -40,13 +39,20 @@ export class Game {
         this.camera.attachControl(this.canvas, false);
         this.light = new HemisphericLight('light1', new Vector3(0, 1, 0), this.scene);
 
-        let voxelData: {voxels: Int32Array; dims: number[]} = this.makeVoxels([0, 0, 0], [30, 30, 30], (x: number, y: number, z: number): number => {
-            let noise: number = this.simplexNoise.scaled3D(x, y, z);
+        let chunkSize: number = 30;
+        for (let chunkZ: number = 0; chunkZ < 3; chunkZ++) {
+            for (let chunkX: number = 0; chunkX < 3; chunkX++) {
+                this.createMesh(
+                    this.makeVoxels([chunkX * chunkSize, 0, chunkZ * chunkSize], [(chunkX + 1) * chunkSize, chunkSize, (chunkZ + 1) * chunkSize],
+                        (x: number, y: number, z: number): number => {
+                            let noise: number = this.simplexNoise.scaled3D(x, y, z);
 
-            return (0.2 < noise) ? 255 : 0; // very slow when colors defined like: 0xff0000
-        });
-
-        this.createMesh(voxelData);
+                            return (0.2 < noise) ? 255 / (chunkX + 1) : 0; // very slow when colors defined like: 0xff0000
+                        }
+                    )
+                );
+            }
+        }
     }
 
     public run(): void {
@@ -74,7 +80,7 @@ export class Game {
         return (h.charAt(0) === '#') ? h.substring(1, 7) : h;
     }
 
-    private makeVoxels(l: number[], h: number[], f: (i: number, j: number, k: number) => number): {voxels: Int32Array; dims: number[]} {
+    private makeVoxels(l: number[], h: number[], f: (i: number, j: number, k: number) => number): {voxels: Int32Array, dims: number[], position: number[]} {
         let dimension: number[] = [h[0] - l[0], h[1] - l[1], h[2] - l[2]];
         let voxels: Int32Array = new Int32Array(dimension[0] * dimension[1] * dimension[2]);
         let n: number = 0;
@@ -87,10 +93,10 @@ export class Game {
             }
         }
 
-        return {voxels: voxels, dims: dimension};
+        return {voxels: voxels, dims: dimension, position: l};
     }
 
-    private createMesh(voxelData: {voxels: Int32Array; dims: number[]}): void {
+    private createMesh(voxelData: {voxels: Int32Array, dims: number[], position: number[]}): void {
         let meshData: {vertices: number[][]; faces: number[][]} = GreedyMesher.createMeshData(voxelData.voxels, voxelData.dims);
 
         let voxelMesh: BABYLON.Mesh = new Mesh('voxelMesh', this.scene);
@@ -98,7 +104,7 @@ export class Game {
 
         this.standardMaterial = new StandardMaterial('standardMaterial', this.scene);
         voxelMesh.material = this.standardMaterial;
-        voxelMesh.position = new Vector3(-voxelData.dims[0] / 2, -voxelData.dims[1] / 2, -voxelData.dims[2] / 4);
+        voxelMesh.position = new Vector3(voxelData.position[0], voxelData.position[1], voxelData.position[2]);
 
         let vertices: number[] = [];
         let tris: number[] = [];
@@ -134,8 +140,8 @@ export class Game {
         console.log('vertices', vertices.length);
         console.log('triangles', tris.length);
 
-        vertexData.applyToMesh(voxelMesh, true);
+        vertexData.applyToMesh(voxelMesh, false);
         // blankmesh._updateBoundingInfo();
-        voxelMesh.checkCollisions = true;
+        // voxelMesh.checkCollisions = true;
     }
 }
