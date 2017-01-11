@@ -1,18 +1,7 @@
 // https://github.com/TriBlade9/VoxelMesher-BabylonJS/tree/master/js
 // http://triblade9.github.io/VoxelMesher-BabylonJS/
 
-import {
-    BABYLON,
-    Scene,
-    FreeCamera,
-    Vector3,
-    Engine,
-    Color3,
-    HemisphericLight,
-    Mesh,
-    StandardMaterial,
-    VertexData
-} from 'babylonjs/babylon.max';
+import BABYLON = require('babylonjs/babylon.max');
 
 import { GreedyMesher } from './greedyMesher';
 import { FastSimplexNoise, Options } from './fastSimplexNoise';
@@ -26,20 +15,20 @@ export class Game {
     private simplexNoise: FastSimplexNoise = new FastSimplexNoise({amplitude: 4, frequency: 0.03, persistence: 0.25} as Options);
 
     public constructor(private canvas: HTMLCanvasElement) {
-        this.engine = new Engine(this.canvas, true);
+        this.engine = new BABYLON.Engine(this.canvas, true);
     }
 
     public createScene(): void {
-        this.scene = new Scene(this.engine);
-        this.scene.gravity = new Vector3(0, -0.5, 0);
-        this.scene.clearColor = new Color3(0.7, 0.7, 0.7);
+        this.scene = new BABYLON.Scene(this.engine);
+        this.scene.gravity = new BABYLON.Vector3(0, -0.5, 0);
+        this.scene.clearColor = new BABYLON.Color3(0.7, 0.7, 0.7);
 
-        this.camera = new FreeCamera('camera1', new Vector3(0, 50, -100), this.scene);
-        this.camera.setTarget(Vector3.Zero());
+        this.camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 50, -100), this.scene);
+        this.camera.setTarget(BABYLON.Vector3.Zero());
         this.camera.attachControl(this.canvas, false);
-        this.light = new HemisphericLight('light1', new Vector3(0, 1, 0), this.scene);
+        this.light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
 
-        this.standardMaterial = new StandardMaterial('standardMaterial', this.scene);
+        this.standardMaterial = new BABYLON.StandardMaterial('standardMaterial', this.scene);
 
         let chunkSize: number = 30;
         for (let chunkZ: number = 0; chunkZ < 3; chunkZ++) {
@@ -124,9 +113,9 @@ export class Game {
         }
 
         // http://babylonjsguide.github.io/advanced/Custom
-        VertexData.ComputeNormals(vertices, tris, normals);
+        BABYLON.VertexData.ComputeNormals(vertices, tris, normals);
 
-        let vertexData: BABYLON.VertexData = new VertexData();
+        let vertexData: BABYLON.VertexData = new BABYLON.VertexData();
         vertexData.positions = vertices;
         vertexData.indices = tris;
         vertexData.normals = normals;
@@ -134,10 +123,10 @@ export class Game {
 
         console.log('vertices', vertices.length, 'triangles', tris.length);
 
-        let voxelMesh: BABYLON.Mesh = new Mesh('voxelMesh', this.scene);
-        voxelMesh.position = Vector3.Zero();
+        let voxelMesh: BABYLON.Mesh = new BABYLON.Mesh('voxelMesh', this.scene);
+        voxelMesh.position = BABYLON.Vector3.Zero();
         voxelMesh.material = this.standardMaterial;
-        voxelMesh.position = new Vector3(voxelData.position[0], voxelData.position[1], voxelData.position[2]);
+        voxelMesh.position = new BABYLON.Vector3(voxelData.position[0], voxelData.position[1], voxelData.position[2]);
 
         vertexData.applyToMesh(voxelMesh, false);
         // blankmesh._updateBoundingInfo();
