@@ -39,6 +39,8 @@ export class Game {
         this.camera.attachControl(this.canvas, false);
         this.light = new HemisphericLight('light1', new Vector3(0, 1, 0), this.scene);
 
+        this.standardMaterial = new StandardMaterial('standardMaterial', this.scene);
+
         let chunkSize: number = 30;
         for (let chunkZ: number = 0; chunkZ < 3; chunkZ++) {
             for (let chunkX: number = 0; chunkX < 3; chunkX++) {
@@ -99,13 +101,6 @@ export class Game {
     private createMesh(voxelData: {voxels: Int32Array, dims: number[], position: number[]}): void {
         let meshData: {vertices: number[][]; faces: number[][]} = GreedyMesher.createMeshData(voxelData.voxels, voxelData.dims);
 
-        let voxelMesh: BABYLON.Mesh = new Mesh('voxelMesh', this.scene);
-        voxelMesh.position = Vector3.Zero();
-
-        this.standardMaterial = new StandardMaterial('standardMaterial', this.scene);
-        voxelMesh.material = this.standardMaterial;
-        voxelMesh.position = new Vector3(voxelData.position[0], voxelData.position[1], voxelData.position[2]);
-
         let vertices: number[] = [];
         let tris: number[] = [];
         let colors: number[] = [];
@@ -137,8 +132,12 @@ export class Game {
         vertexData.normals = normals;
         vertexData.colors = colors;
 
-        console.log('vertices', vertices.length);
-        console.log('triangles', tris.length);
+        console.log('vertices', vertices.length, 'triangles', tris.length);
+
+        let voxelMesh: BABYLON.Mesh = new Mesh('voxelMesh', this.scene);
+        voxelMesh.position = Vector3.Zero();
+        voxelMesh.material = this.standardMaterial;
+        voxelMesh.position = new Vector3(voxelData.position[0], voxelData.position[1], voxelData.position[2]);
 
         vertexData.applyToMesh(voxelMesh, false);
         // blankmesh._updateBoundingInfo();
