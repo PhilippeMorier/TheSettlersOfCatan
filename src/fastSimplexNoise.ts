@@ -12,13 +12,13 @@
  */
 
 export interface Options {
-    amplitude?: number
-    frequency?: number
-    max?: number
-    min?: number
-    octaves?: number
-    persistence?: number
-    random?: () => number
+    amplitude?: number;
+    frequency?: number;
+    max?: number;
+    min?: number;
+    octaves?: number;
+    persistence?: number;
+    random?: () => number;
 }
 
 export class FastSimplexNoise {
@@ -76,32 +76,32 @@ export class FastSimplexNoise {
         if (options.hasOwnProperty('persistence')) {
             if (typeof options.persistence !== 'number') throw new Error('options.persistence must be a number')
             this.persistence = options.persistence
-        } else this.persistence = 0.5
+        } else this.persistence = 0.5;
 
         if (options.hasOwnProperty('random')) {
             if (typeof options.random !== 'function') throw new Error('options.random must be a function')
             this.random = options.random
-        } else this.random = Math.random
+        } else this.random = Math.random;
 
-        let min: number
+        let min: number;
         if (options.hasOwnProperty('min')) {
-            if (typeof options.min !== 'number') throw new Error('options.min must be a number')
+            if (typeof options.min !== 'number') throw new Error('options.min must be a number');
             min = options.min
-        } else min = -1
+        } else min = -1;
 
-        let max: number
+        let max: number;
         if (options.hasOwnProperty('max')) {
             if (typeof options.max !== 'number') throw new Error('options.max must be a number')
             max = options.max
-        } else max = 1
+        } else max = 1;
 
-        if (min >= max) throw new Error(`options.min (${min}) must be less than options.max (${max})`)
+        if (min >= max) throw new Error(`options.min (${min}) must be less than options.max (${max})`);
 
         this.scale = min === -1 && max === 1
             ? value => value
-            : value => min + ((value + 1) / 2) * (max - min)
+            : value => min + ((value + 1) / 2) * (max - min);
 
-        const p = new Uint8Array(256)
+        const p = new Uint8Array(256);
         for (let i = 0; i < 256; i++) p[i] = i
 
         let n: number;
@@ -113,38 +113,38 @@ export class FastSimplexNoise {
             p[n] = q
         }
 
-        this.perm = new Uint8Array(512)
-        this.permMod12 = new Uint8Array(512)
+        this.perm = new Uint8Array(512);
+        this.permMod12 = new Uint8Array(512);
         for (let i = 0; i < 512; i++) {
-            this.perm[i] = p[i & 255]
+            this.perm[i] = p[i & 255];
             this.permMod12[i] = this.perm[i] % 12
         }
     }
 
     cylindrical (circumference: number, coords: number[]): number {
         switch (coords.length) {
-            case 2: return this.cylindrical2D(circumference, coords[0], coords[1])
-            case 3: return this.cylindrical3D(circumference, coords[0], coords[1], coords[2])
+            case 2: return this.cylindrical2D(circumference, coords[0], coords[1]);
+            case 3: return this.cylindrical3D(circumference, coords[0], coords[1], coords[2]);
             default: return null
         }
     }
 
     cylindrical2D (circumference: number, x: number, y: number): number {
-        const nx = x / circumference
-        const r = circumference / (2 * Math.PI)
-        const rdx = nx * 2 * Math.PI
-        const a = r * Math.sin(rdx)
-        const b = r * Math.cos(rdx)
+        const nx = x / circumference;
+        const r = circumference / (2 * Math.PI);
+        const rdx = nx * 2 * Math.PI;
+        const a = r * Math.sin(rdx);
+        const b = r * Math.cos(rdx);
 
         return this.scaled3D(a, b, y)
     }
 
     cylindrical3D (circumference: number, x: number, y: number, z: number) {
-        const nx = x / circumference
-        const r = circumference / (2 * Math.PI)
-        const rdx = nx * 2 * Math.PI
-        const a = r * Math.sin(rdx)
-        const b = r * Math.cos(rdx)
+        const nx = x / circumference;
+        const r = circumference / (2 * Math.PI);
+        const rdx = nx * 2 * Math.PI;
+        const a = r * Math.sin(rdx);
+        const b = r * Math.cos(rdx);
 
         return this.scaled4D(a, b, y, z)
     }
@@ -157,9 +157,9 @@ export class FastSimplexNoise {
 
     raw (coords: number[]): number {
         switch (coords.length) {
-            case 2: return this.raw2D(coords[0], coords[1])
-            case 3: return this.raw3D(coords[0], coords[1], coords[2])
-            case 4: return this.raw4D(coords[0], coords[1], coords[2], coords[3])
+            case 2: return this.raw2D(coords[0], coords[1]);
+            case 3: return this.raw3D(coords[0], coords[1], coords[2]);
+            case 4: return this.raw4D(coords[0], coords[1], coords[2], coords[3]);
             default: return null
         }
     }
@@ -176,29 +176,29 @@ export class FastSimplexNoise {
         const y0 = y - Y0
 
         // Determine which simplex we are in.
-        const i1 = x0 > y0 ? 1 : 0
-        const j1 = x0 > y0 ? 0 : 1
+        const i1 = x0 > y0 ? 1 : 0;
+        const j1 = x0 > y0 ? 0 : 1;
 
         // Offsets for corners
-        const x1 = x0 - i1 + FastSimplexNoise.G2
-        const y1 = y0 - j1 + FastSimplexNoise.G2
-        const x2 = x0 - 1.0 + 2.0 * FastSimplexNoise.G2
-        const y2 = y0 - 1.0 + 2.0 * FastSimplexNoise.G2
+        const x1 = x0 - i1 + FastSimplexNoise.G2;
+        const y1 = y0 - j1 + FastSimplexNoise.G2;
+        const x2 = x0 - 1.0 + 2.0 * FastSimplexNoise.G2;
+        const y2 = y0 - 1.0 + 2.0 * FastSimplexNoise.G2;
 
         // Work out the hashed gradient indices of the three simplex corners
-        const ii = i & 255
-        const jj = j & 255
-        const gi0 = this.permMod12[ii + this.perm[jj]]
-        const gi1 = this.permMod12[ii + i1 + this.perm[jj + j1]]
-        const gi2 = this.permMod12[ii + 1 + this.perm[jj + 1]]
+        const ii = i & 255;
+        const jj = j & 255;
+        const gi0 = this.permMod12[ii + this.perm[jj]];
+        const gi1 = this.permMod12[ii + i1 + this.perm[jj + j1]];
+        const gi2 = this.permMod12[ii + 1 + this.perm[jj + 1]];
 
         // Calculate the contribution from the three corners
-        const t0 = 0.5 - x0 * x0 - y0 * y0
-        const n0 = t0 < 0 ? 0.0 : Math.pow(t0, 4) * this.dot(FastSimplexNoise.GRAD3D[gi0], [x0, y0])
-        const t1 = 0.5 - x1 * x1 - y1 * y1
-        const n1 = t1 < 0 ? 0.0 : Math.pow(t1, 4) * this.dot(FastSimplexNoise.GRAD3D[gi1], [x1, y1])
-        const t2 = 0.5 - x2 * x2 - y2 * y2
-        const n2 = t2 < 0 ? 0.0 : Math.pow(t2, 4) * this.dot(FastSimplexNoise.GRAD3D[gi2], [x2, y2])
+        const t0 = 0.5 - x0 * x0 - y0 * y0;
+        const n0 = t0 < 0 ? 0.0 : Math.pow(t0, 4) * this.dot(FastSimplexNoise.GRAD3D[gi0], [x0, y0]);
+        const t1 = 0.5 - x1 * x1 - y1 * y1;
+        const n1 = t1 < 0 ? 0.0 : Math.pow(t1, 4) * this.dot(FastSimplexNoise.GRAD3D[gi1], [x1, y1]);
+        const t2 = 0.5 - x2 * x2 - y2 * y2;
+        const n2 = t2 < 0 ? 0.0 : Math.pow(t2, 4) * this.dot(FastSimplexNoise.GRAD3D[gi2], [x2, y2]);
 
         // Add contributions from each corner to get the final noise value.
         // The result is scaled to return values in the interval [-1, 1]
@@ -208,16 +208,16 @@ export class FastSimplexNoise {
     raw3D (x: number, y: number, z: number): number {
         // Skew the input space to determine which simplex cell we're in
         const s = (x + y + z) / 3.0 // Very nice and simple skew factor for 3D
-        const i = Math.floor(x + s)
-        const j = Math.floor(y + s)
-        const k = Math.floor(z + s)
-        const t = (i + j + k) * FastSimplexNoise.G3
-        const X0 = i - t // Unskew the cell origin back to (x,y,z) space
-        const Y0 = j - t
-        const Z0 = k - t
-        const x0 = x - X0 // The x,y,z distances from the cell origin
-        const y0 = y - Y0
-        const z0 = z - Z0
+        const i = Math.floor(x + s);
+        const j = Math.floor(y + s);
+        const k = Math.floor(z + s);
+        const t = (i + j + k) * FastSimplexNoise.G3;
+        const X0 = i - t; // Unskew the cell origin back to (x,y,z) space
+        const Y0 = j - t;
+        const Z0 = k - t;
+        const x0 = x - X0; // The x,y,z distances from the cell origin
+        const y0 = y - Y0;
+        const z0 = z - Z0;
 
         // Deterine which simplex we are in
         let i1: number, j1: number, k1: number // Offsets for second corner of simplex in (i,j,k) coords
@@ -367,16 +367,16 @@ export class FastSimplexNoise {
         const gi4 = this.perm[ii + 1 + this.perm[jj + 1 + this.perm[kk + 1 + this.perm[ll + 1]]]] % 32
 
         // Calculate the contribution from the five corners
-        const t0 = 0.5 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0
-        const n0 = t0 < 0 ? 0.0 : Math.pow(t0, 4) * this.dot(FastSimplexNoise.GRAD4D[gi0], [x0, y0, z0, w0])
-        const t1 = 0.5 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1
-        const n1 = t1 < 0 ? 0.0 : Math.pow(t1, 4) * this.dot(FastSimplexNoise.GRAD4D[gi1], [x1, y1, z1, w1])
-        const t2 = 0.5 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2
-        const n2 = t2 < 0 ? 0.0 : Math.pow(t2, 4) * this.dot(FastSimplexNoise.GRAD4D[gi2], [x2, y2, z2, w2])
-        const t3 = 0.5 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3
-        const n3 = t3 < 0 ? 0.0 : Math.pow(t3, 4) * this.dot(FastSimplexNoise.GRAD4D[gi3], [x3, y3, z3, w3])
-        const t4 = 0.5 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4
-        const n4 = t4 < 0 ? 0.0 : Math.pow(t4, 4) * this.dot(FastSimplexNoise.GRAD4D[gi4], [x4, y4, z4, w4])
+        const t0 = 0.5 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
+        const n0 = t0 < 0 ? 0.0 : Math.pow(t0, 4) * this.dot(FastSimplexNoise.GRAD4D[gi0], [x0, y0, z0, w0]);
+        const t1 = 0.5 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
+        const n1 = t1 < 0 ? 0.0 : Math.pow(t1, 4) * this.dot(FastSimplexNoise.GRAD4D[gi1], [x1, y1, z1, w1]);
+        const t2 = 0.5 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
+        const n2 = t2 < 0 ? 0.0 : Math.pow(t2, 4) * this.dot(FastSimplexNoise.GRAD4D[gi2], [x2, y2, z2, w2]);
+        const t3 = 0.5 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
+        const n3 = t3 < 0 ? 0.0 : Math.pow(t3, 4) * this.dot(FastSimplexNoise.GRAD4D[gi3], [x3, y3, z3, w3]);
+        const t4 = 0.5 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
+        const n4 = t4 < 0 ? 0.0 : Math.pow(t4, 4) * this.dot(FastSimplexNoise.GRAD4D[gi4], [x4, y4, z4, w4]);
 
         // Sum up and scale the result to cover the range [-1,1]
         return 72.37855765153665 * (n0 + n1 + n2 + n3 + n4)
