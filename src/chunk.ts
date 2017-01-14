@@ -21,7 +21,7 @@ export class Chunk {
         for (let z: number = 0; z < this.size.z; ++z) {
             for (let y: number = 0; y < this.size.y; ++y) {
                 for (let x: number = 0; x < this.size.x; ++x, ++n) {
-                    voxels[n] = this.voxelor.generate(x, y, z);
+                    voxels[n] = this.voxelor.generate(x + this.position.x, y + this.position.y, z + this.position.z);
                 }
             }
         }
@@ -50,7 +50,17 @@ export class SimplexNoiseVoxelor implements VoxelStrategy {
     public generate(x: number, y: number, z: number): number {
         let noise: number = this.simplexNoise.scaled3D(x, y, z);
 
-        return (0.2 < noise) ? 1 : 0;
+        if (0.2 <= noise && noise < 0.5) {
+            return 1;
+        }
+        if (0.5 <= noise && noise < 0.8) {
+            return 2;
+        }
+        if (0.8 <= noise && noise <= 1.0) {
+            return 3;
+        }
+
+        return 0;
     }
 }
 
@@ -59,6 +69,18 @@ export interface MeshStrategy {
 }
 
 export class GreedMesher implements MeshStrategy {
+    private colors: BABYLON.Color3[] = [
+        BABYLON.Color3.Red(),
+        BABYLON.Color3.Green(),
+        BABYLON.Color3.Blue(),
+        BABYLON.Color3.Black(),
+        BABYLON.Color3.White(),
+        BABYLON.Color3.Purple(),
+        BABYLON.Color3.Magenta(),
+        BABYLON.Color3.Yellow(),
+        BABYLON.Color3.Gray()
+    ];
+
     public create(voxels: VoxelData): BABYLON.VertexData {
         let meshData: {vertices: number[][]; faces: number[][]} = GreedyMesher.createMeshData(voxels.voxels, voxels.dims);
 
@@ -75,11 +97,12 @@ export class GreedMesher implements MeshStrategy {
         for (let i: number = 0; i < meshData.faces.length; ++i) {
             let q: number[] = meshData.faces[i];
             tris.push(q[2], q[1], q[0]);
-            // let color: number = q[3];
+
+            let colorIndex: number = q[3];
             for (let i2: number = 0; i2 < 4; i2++) {
-                colors[q[i2] * 4] = 1; // (color & 0xff0000) >> 0xf0;
-                colors[(q[i2] * 4) + 1] = 0; // (color & 0xff0000) >> 0x8;
-                colors[(q[i2] * 4) + 2] = 1; // (color & 0xff0000) >> 0x0;
+                colors[q[i2] * 4] = this.colors[colorIndex].r;
+                colors[(q[i2] * 4) + 1] = this.colors[colorIndex].g;
+                colors[(q[i2] * 4) + 2] = this.colors[colorIndex].b;
                 colors[(q[i2] * 4) + 3] = 1;
             }
         }

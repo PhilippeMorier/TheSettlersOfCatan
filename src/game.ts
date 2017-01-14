@@ -28,9 +28,7 @@ export class Game {
 
         this.standardMaterial = new BABYLON.StandardMaterial('standardMaterial', this.scene);
 
-        let chunk: Chunk = new Chunk(BABYLON.Vector3.Zero(), new BABYLON.Vector3(30, 30, 30), new SimplexNoiseVoxelor(), new GreedMesher());
-        chunk.initializeVoxel();
-        chunk.addToScene(this.scene, this.standardMaterial);
+        this.addChunks();
     }
 
     public run(): void {
@@ -43,5 +41,19 @@ export class Game {
         window.addEventListener('resize', () => {
             this.engine.resize();
         });
+    }
+
+    private addChunks(): void {
+        let simplexNoiseVoxelor = new SimplexNoiseVoxelor();
+
+        for (let z: number = 0; z < 2; z++) {
+            for (let y: number = 0; y < 2; y++) {
+                for (let x: number = 0; x < 2; x++) {
+                    let chunk: Chunk = new Chunk(new BABYLON.Vector3(x * 30, y * 30, z * 30), new BABYLON.Vector3(30, 30, 30), simplexNoiseVoxelor, new GreedMesher());
+                    chunk.initializeVoxel();
+                    chunk.addToScene(this.scene, this.standardMaterial);
+                }
+            }
+        }
     }
 }
