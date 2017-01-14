@@ -392,16 +392,16 @@ export class FastSimplexNoise {
     }
 
     scaled2D (x: number, y: number): number {
-        let amplitude = this.amplitude
-        let frequency = this.frequency
-        let maxAmplitude = 0
-        let noise = 0
+        let amplitude = this.amplitude;
+        let frequency = this.frequency;
+        let maxAmplitude = 0;
+        let noise = 0;
 
         for (let i = 0; i < this.octaves; i++) {
-            noise += this.raw2D(x * frequency, y * frequency) * amplitude
-            maxAmplitude += amplitude
-            amplitude *= this.persistence
-            frequency *= 2
+            noise += this.raw2D(x * frequency, y * frequency) * amplitude;
+            maxAmplitude += amplitude;
+            amplitude *= this.persistence;
+            frequency *= 2;
         }
 
         return this.scale(noise / maxAmplitude)
@@ -417,7 +417,7 @@ export class FastSimplexNoise {
             noise += this.raw3D(x * frequency, y * frequency, z * frequency) * amplitude;
             maxAmplitude += amplitude;
             amplitude *= this.persistence;
-            frequency *= 2
+            frequency *= 2;
         }
 
         return this.scale(noise / maxAmplitude)
@@ -448,15 +448,15 @@ export class FastSimplexNoise {
     }
 
     spherical2D (circumference: number, x: number, y: number): number {
-        const nx = x / circumference
-        const ny = y / circumference
-        const rdx = nx * 2 * Math.PI
-        const rdy = ny * Math.PI
-        const sinY = Math.sin(rdy + Math.PI)
-        const sinRds = 2 * Math.PI
-        const a = sinRds * Math.sin(rdx) * sinY
-        const b = sinRds * Math.cos(rdx) * sinY
-        const d = sinRds * Math.cos(rdy)
+        const nx = x / circumference;
+        const ny = y / circumference;
+        const rdx = nx * 2 * Math.PI;
+        const rdy = ny * Math.PI;
+        const sinY = Math.sin(rdy + Math.PI);
+        const sinRds = 2 * Math.PI;
+        const a = sinRds * Math.sin(rdx) * sinY;
+        const b = sinRds * Math.cos(rdx) * sinY;
+        const d = sinRds * Math.cos(rdy);
 
         return this.scaled3D(a, b, d)
     }
