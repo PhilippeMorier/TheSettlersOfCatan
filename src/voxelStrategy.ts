@@ -25,22 +25,45 @@ export class SimplexNoiseVoxelor implements VoxelStrategy {
 }
 
 export class SimplexNoise2DVoxelor implements  VoxelStrategy {
-    private simplexNoise: FastSimplexNoise = new FastSimplexNoise({amplitude: 4, frequency: 0.005, persistence: 0.25} as Options);
+    private landNoise: FastSimplexNoise = new FastSimplexNoise({octaves: 1, amplitude: 1, frequency: 0.025, persistence: 0.25} as Options);
+    // private falloffNoise: FastSimplexNoise = new FastSimplexNoise({octaves: 3, amplitude: 0.3, frequency: 0.005, persistence: 0.5} as Options);
+    private falloff: (x: number, y: number) => number = this.makeGaussian(1, 75, 75, 25, 25);
 
     public generate(x: number, y: number, z: number): number {
-        let noise: number = this.simplexNoise.scaled2D(x, z) + 1;
-        let height: number = noise * 30;
+        if (y < 1) {
+            return 6;
+        }
+
+        let landNoise: number = this.landNoise.scaled2D(x, z) + 1;
+        // let falloffNoise: number = this.falloffNoise.scaled2D(x, z) + 1;
+        let falloff: number = this.falloff(x, z);
+
+        // let height: number = landNoise * 30;
+        // let height: number = falloffNoise * 30;
+        let height: number = falloff * landNoise * 15;
 
         if (y > height) {
             return 0;
         }
         if (y > height - 5) {
-            return 4;
+            return 3;
         }
         if (y > height - 30) {
-            return 1;
+            return 4;
         }
 
-        return 3;
+        return 7;
+    }
+
+    private makeGaussian(amplitude: number, x0: number, y0: number, sigmaX: number, sigmaY: number): (x: number, y: number) => number {
+        return function (x: number, y: number): number {
+            let exponent: number =
+                -(
+                    ( Math.pow(x - x0, 2) / (2 * Math.pow(sigmaX, 2)))
+                    + ( Math.pow(y - y0, 2) / (2 * Math.pow(sigmaY, 2)))
+                );
+
+            return amplitude * Math.pow(Math.E, exponent);
+        };
     }
 }

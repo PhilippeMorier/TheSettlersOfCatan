@@ -9,15 +9,15 @@ export interface MeshStrategy {
 
 export class GreedMesher implements MeshStrategy {
     private colors: BABYLON.Color3[] = [
+        BABYLON.Color3.White(),
+        BABYLON.Color3.Yellow(),
         BABYLON.Color3.Red(),
         BABYLON.Color3.Green(),
-        BABYLON.Color3.Blue(),
-        BABYLON.Color3.Black(),
-        BABYLON.Color3.White(),
-        BABYLON.Color3.Purple(),
         BABYLON.Color3.Magenta(),
-        BABYLON.Color3.Yellow(),
-        BABYLON.Color3.Gray()
+        BABYLON.Color3.Purple(),
+        BABYLON.Color3.Blue(),
+        BABYLON.Color3.Gray(),
+        BABYLON.Color3.Black()
     ];
 
     public create(voxels: VoxelData): BABYLON.VertexData {
