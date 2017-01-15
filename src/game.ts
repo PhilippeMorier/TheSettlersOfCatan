@@ -23,7 +23,7 @@ export class Game {
         this.scene.gravity = new BABYLON.Vector3(0, -0.5, 0);
         this.scene.clearColor = new BABYLON.Color3(0.7, 0.7, 0.7);
 
-        this.camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 100, -100), this.scene);
+        this.camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 200, -200), this.scene);
         this.camera.setTarget(BABYLON.Vector3.Zero());
         this.camera.attachControl(this.canvas, false);
         this.light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
@@ -35,6 +35,7 @@ export class Game {
 
     public run(): void {
         this.engine.runRenderLoop(() => {
+            (document.getElementById('fps') as HTMLSpanElement).innerText = this.engine.getFps().toFixed() + 'fps';
             this.standardMaterial.wireframe = (document.getElementById('wireframe') as HTMLInputElement).checked;
             this.standardMaterial.backFaceCulling = true;
             this.scene.render();
@@ -53,12 +54,13 @@ export class Game {
 
         for (let z: number = 0; z < worldSize.z; z++) {
             for (let y: number = 0; y < worldSize.y; y++) {
-                for (let x: number = 0; x < worldSize.z; x++, chunkCounter++) {
+                for (let x: number = 0; x < worldSize.x; x++, chunkCounter++) {
                     let chunk: Chunk = new Chunk(new BABYLON.Vector3(x * 30, y * 30, z * 30), new BABYLON.Vector3(30, 30, 30), voxelStrategy, new GreedMesher());
-                    chunk.initializeVoxel();
-                    chunk.addToScene(this.scene, this.standardMaterial);
+                    setTimeout(() => {
+                        chunk.initializeVoxel();
+                        chunk.addToScene(this.scene, this.standardMaterial);
+                    }, 1);
                 }
-                console.log(100 / (worldSize.x * worldSize.y * worldSize.z) * chunkCounter + '%');
             }
         }
     }
