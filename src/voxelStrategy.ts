@@ -1,3 +1,5 @@
+import BABYLON = require('babylonjs/babylon.max');
+
 import { FastSimplexNoise, Options } from './fastSimplexNoise';
 
 export interface VoxelStrategy {
@@ -30,7 +32,7 @@ export class SimplexNoise2DVoxelor implements  VoxelStrategy {
     private falloff: (x: number, y: number) => number = this.makeGaussian(1, 75, 75, 25, 25);
 
     public generate(x: number, y: number, z: number): number {
-        if (y < 1) {
+        if (y < 1 && this.isPointInsideHexagon(new BABYLON.Vector2(x, z))) {
             return 6;
         }
 
@@ -65,5 +67,19 @@ export class SimplexNoise2DVoxelor implements  VoxelStrategy {
 
             return amplitude * Math.pow(Math.E, exponent);
         };
+    }
+
+    private isPointInsideHexagon(point: BABYLON.Vector2): boolean {
+        // http://www.playchilla.com/how-to-check-if-a-point-is-inside-a-hexagon
+        let center: BABYLON.Vector2 = new BABYLON.Vector2(75, 75);
+        let radius: number = 75;
+        const q2x: number = Math.abs(point.x - center.x); // transform the test point locally and to quadrant 2
+        const q2y: number = Math.abs(point.y - center.y); // transform the test point locally and to quadrant 2
+
+        if (q2x > radius || q2y > radius) {
+            return false; // bounding test (since q2 is in quadrant 2 only 2 tests are needed)
+        }
+
+        return (radius * radius - (radius / 2) * q2x - radius * q2y) >= 0;   // finally the dot product can be reduced to this due to the hexagon symmetry
     }
 }
