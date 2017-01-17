@@ -4,8 +4,9 @@
   "description": "A 3D web implementation of the famous board game",
   "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack": "webpack --progress",
+    "test": "karma start karma.conf.js --singleRun",
+    "test:watch": "karma start karma.conf.js --auto-watch",
+    "webpack": "webpack --progress --config ./webpack.conf.js",
     "tslint": "tslint --project ./tsconfig.json --config tslint.json './src/**/*.ts'"
   },
   "repository": {
@@ -26,8 +27,15 @@
   "homepage": "https://github.com/PhilippeMorier/TheSettlersOfCatan#readme",
   "devDependencies": {
     "@types/babylonjs": "2.3.31",
+    "@types/jasmine": "2.5.40",
+    "@types/node": "7.0.0",
     "html-loader": "0.4.4",
     "html-webpack-plugin": "2.26.0",
+    "jasmine-core": "2.5.2",
+    "karma": "1.4.0",
+    "karma-chrome-launcher": "2.0.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-mocha-reporter": "2.2.1",
     "ts-loader": "1.3.3",
     "tslint": "4.3.1",
     "typescript": "2.1.4",

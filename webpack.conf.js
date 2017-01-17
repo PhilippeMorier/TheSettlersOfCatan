@@ -5,6 +5,9 @@ module.exports = {
     entry: {
         'app': [
             './src/app.ts'
+        ],
+        'spec': [
+            './src/spec.ts'
         ]
     },
 
