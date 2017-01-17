@@ -33,9 +33,12 @@ module.exports = {
         ]
     },
 
+    devtool: 'source-map',
+
     plugins: [
         new HtmlWebpackPlugin({
-            template: './index.ejs'
+            template: './index.ejs',
+            excludeChunks: ['spec']
         })
     ]
 };
