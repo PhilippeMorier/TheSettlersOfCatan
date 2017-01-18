@@ -1,8 +1,12 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
 module.exports = {
     entry: {
+        'vendor': [
+            'babylonjs'
+        ],
         'app': [
             './src/app.ts'
         ],
@@ -39,6 +43,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './index.ejs',
             excludeChunks: ['spec']
+        }),
+        new CommonsChunkPlugin({
+            name: 'vendor'
         })
     ]
 };
