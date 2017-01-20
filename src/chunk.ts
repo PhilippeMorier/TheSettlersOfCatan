@@ -1,8 +1,9 @@
 import BABYLON = require('babylonjs/babylon.max');
 
 import { VoxelData } from './voxelData';
-import { VoxelStrategy } from './voxelStrategy';
 import { MeshStrategy } from './meshStrategy';
+import { HexagonGrid } from './hexagonGrid';
+import { Hexagon } from './hexagon';
 
 export class Chunk {
     private voxels: VoxelData;
@@ -10,8 +11,8 @@ export class Chunk {
 
     public constructor(public position: BABYLON.Vector3,
                        public size: BABYLON.Vector3,
-                       private voxelor: VoxelStrategy,
-                       private mesher: MeshStrategy) {
+                       private mesher: MeshStrategy,
+                       private grid: HexagonGrid) {
     }
 
     // private getVoxel(x: number, y: number, z: number): number {
@@ -25,7 +26,9 @@ export class Chunk {
         for (let z: number = 0; z < this.size.z; ++z) {
             for (let y: number = 0; y < this.size.y; ++y) {
                 for (let x: number = 0; x < this.size.x; ++x, ++n) {
-                    voxels[n] = this.voxelor.generate(x + this.position.x, y + this.position.y, z + this.position.z);
+
+                    let hexagon: Hexagon = this.grid.getHexagonByPixel(x + this.position.x, z + this.position.z);
+                    voxels[n] = (hexagon) ? hexagon.voxelor.generate(x + this.position.x, y + this.position.y, z + this.position.z) : 0;
                 }
             }
         }

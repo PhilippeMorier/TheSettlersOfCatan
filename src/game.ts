@@ -4,8 +4,10 @@
 import BABYLON = require('babylonjs/babylon.max');
 
 import { Chunk } from './chunk';
-import { SimplexNoise2DVoxelor, VoxelStrategy } from './voxelStrategy';
+import { SimplexNoise2DVoxelor, ColorVoxelor, SimplexNoiseVoxelor } from './voxelStrategy';
 import { GreedMesher } from './meshStrategy';
+import { HexagonGrid } from './hexagonGrid';
+import { Hexagon } from './hexagon';
 
 export class Game {
     private engine: BABYLON.Engine;
@@ -13,6 +15,7 @@ export class Game {
     private camera: BABYLON.FreeCamera;
     private light: BABYLON.Light;
     private standardMaterial: BABYLON.StandardMaterial;
+    private grid: HexagonGrid;
 
     public constructor(private canvas: HTMLCanvasElement) {
         this.engine = new BABYLON.Engine(this.canvas, true);
@@ -29,6 +32,11 @@ export class Game {
         this.light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
 
         this.standardMaterial = new BABYLON.StandardMaterial('standardMaterial', this.scene);
+
+        this.grid = new HexagonGrid(3, 50);
+        this.grid.setHexagon(0, 0, new Hexagon(new SimplexNoise2DVoxelor()));
+        this.grid.setHexagon(1, 0, new Hexagon(new ColorVoxelor(2)));
+        this.grid.setHexagon(0, 1, new Hexagon(new SimplexNoiseVoxelor()));
 
         this.addChunks();
     }
@@ -47,15 +55,19 @@ export class Game {
     }
 
     private addChunks(): void {
-        let voxelStrategy: VoxelStrategy = new SimplexNoise2DVoxelor();
-
-        let worldSize: BABYLON.Vector3 = new BABYLON.Vector3(5, 2, 5);
+        let worldSize: BABYLON.Vector3 = new BABYLON.Vector3(10, 1, 10);
         let chunkCounter: number = 0;
+        let chunkSize: number = 40;
 
-        for (let z: number = 0; z < worldSize.z; z++) {
-            for (let y: number = 0; y < worldSize.y; y++) {
-                for (let x: number = 0; x < worldSize.x; x++, chunkCounter++) {
-                    let chunk: Chunk = new Chunk(new BABYLON.Vector3(x * 30, y * 30, z * 30), new BABYLON.Vector3(30, 30, 30), voxelStrategy, new GreedMesher());
+        for (let z: number = -worldSize.z / 2; z < worldSize.z / 2; z++) {
+            for (let y: number = -worldSize.y / 2; y < worldSize.y / 2; y++) {
+                for (let x: number = -worldSize.x / 2; x < worldSize.x / 2; x++, chunkCounter++) {
+                    let chunk: Chunk = new Chunk(
+                        new BABYLON.Vector3(x * chunkSize, y * chunkSize, z * chunkSize),
+                        new BABYLON.Vector3(chunkSize, chunkSize, chunkSize),
+                        new GreedMesher(),
+                        this.grid
+                    );
                     setTimeout(() => {
                         chunk.initializeVoxel();
                         chunk.addToScene(this.scene, this.standardMaterial);
