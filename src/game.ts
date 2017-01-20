@@ -35,8 +35,12 @@ export class Game {
 
         this.grid = new HexagonGrid(3, 50);
         this.grid.setHexagon(0, 0, new Hexagon(new SimplexNoise2DVoxelor()));
-        this.grid.setHexagon(1, 0, new Hexagon(new ColorVoxelor(2)));
+        this.grid.setHexagon(1, 0, new Hexagon(new ColorVoxelor(1)));
         this.grid.setHexagon(0, 1, new Hexagon(new SimplexNoiseVoxelor()));
+        this.grid.setHexagon(-1, 1, new Hexagon(new ColorVoxelor(2)));
+        this.grid.setHexagon(-1, 0, new Hexagon(new ColorVoxelor(3)));
+        this.grid.setHexagon(0, -1, new Hexagon(new ColorVoxelor(4)));
+        this.grid.setHexagon(1, -1, new Hexagon(new ColorVoxelor(5)));
 
         this.addChunks();
     }
