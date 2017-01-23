@@ -74,3 +74,26 @@ export class ColorVoxelor implements VoxelStrategy {
         return this.colorIndex;
     }
 }
+
+export class GaussianVoxelor implements VoxelStrategy {
+    public constructor(private amplitude: number, private x0: number, private y0: number, private sigmaX: number, private sigmaY: number) {
+    }
+
+    public generate(x: number, y: number, z: number): number {
+        if (y < this.calculateGassian(x, z) * 30) {
+            return 2;
+        }
+
+        return 0;
+    }
+
+    private calculateGassian(x: number, y: number): number {
+        let exponent: number =
+            -(
+                ( Math.pow(x - this.x0, 2) / (2 * Math.pow(this.sigmaX, 2)))
+                + ( Math.pow(y - this.y0, 2) / (2 * Math.pow(this.sigmaY, 2)))
+            );
+
+        return this.amplitude * Math.pow(Math.E, exponent);
+    };
+}

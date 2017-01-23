@@ -8,6 +8,13 @@ export class HexagonGrid {
         this.initializeRows();
     }
 
+    public axialToPixel(column: number, row: number): BABYLON.Vector2 {
+        let x: number = this.edgeWidth * Math.sqrt(3) * (column + row / 2);
+        let y: number = this.edgeWidth * 3 / 2 * row;
+
+        return new BABYLON.Vector2(x, y);
+    }
+
     public getHexagon(column: number, row: number): Hexagon {
         let index: BABYLON.Vector2 = this.axialToIndex(column, row);
 
