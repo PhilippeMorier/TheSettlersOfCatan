@@ -1,9 +1,9 @@
 import BABYLON = require('babylonjs/babylon.max');
 
-import { VoxelData } from './voxelData';
-import { MeshStrategy } from './meshStrategy';
-import { HexagonGrid } from './hexagonGrid';
-import { Hexagon } from './hexagon';
+import { VoxelData } from './mesh/voxelData';
+import { MeshStrategy } from './mesh/meshStrategy';
+import { HexagonGrid } from './grid/hexagonGrid';
+import { Hexagon } from './grid/hexagon';
 
 export class Chunk {
     private voxels: VoxelData;

@@ -4,10 +4,10 @@
 import BABYLON = require('babylonjs/babylon.max');
 
 import { Chunk } from './chunk';
-import { MountainVoxelor } from './voxelStrategy';
-import { GreedMesher } from './meshStrategy';
-import { HexagonGrid } from './hexagonGrid';
-import { Hexagon } from './hexagon';
+import { MountainVoxelor } from './voxel/voxelStrategy';
+import { GreedMesher } from './mesh/meshStrategy';
+import { HexagonGrid } from './grid/hexagonGrid';
+import { Hexagon } from './grid/hexagon';
 
 export class Game {
     private engine: BABYLON.Engine;

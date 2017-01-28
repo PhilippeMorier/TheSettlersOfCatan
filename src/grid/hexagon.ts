@@ -1,4 +1,4 @@
-import { VoxelStrategy } from './voxelStrategy';
+import { VoxelStrategy } from '../voxel/voxelStrategy';
 
 export class Hexagon {
 

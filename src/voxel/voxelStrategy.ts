@@ -1,4 +1,4 @@
-import { FastSimplexNoise, Options } from './fastSimplexNoise';
+import { FastSimplexNoise, Options } from '../mesh/fastSimplexNoise';
 
 export interface VoxelStrategy {
     generate(x: number, y: number, z: number): number;
