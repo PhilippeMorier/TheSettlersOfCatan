@@ -24,70 +24,23 @@ export class SimplexNoiseVoxelor implements VoxelStrategy {
     }
 }
 
-export class SimplexNoise2DVoxelor implements  VoxelStrategy {
-    private landNoise: FastSimplexNoise = new FastSimplexNoise({octaves: 1, amplitude: 1, frequency: 0.025, persistence: 0.25} as Options);
-    // private falloffNoise: FastSimplexNoise = new FastSimplexNoise({octaves: 3, amplitude: 0.3, frequency: 0.005, persistence: 0.5} as Options);
-    // private falloff: (x: number, y: number) => number = this.makeGaussian(1, 75, 75, 25, 25);
+// export class ColorVoxelor implements VoxelStrategy {
+//     public constructor(private colorIndex: number) {
+//
+//     }
+//
+//     public generate(x: number, y: number, z: number): number {
+//         return this.colorIndex;
+//     }
+// }
 
-    public generate(x: number, y: number, z: number): number {
-
-        let landNoise: number = this.landNoise.scaled2D(x, z) + 1;
-        // let falloffNoise: number = this.falloffNoise.scaled2D(x, z) + 1;
-        // let falloff: number = this.falloff(x, z);
-
-        let height: number = landNoise * 30;
-        // let height: number = falloffNoise * 30;
-        // let height: number = falloff * landNoise * 15;
-
-        if (y > height) {
-            return 0;
-        }
-        if (y > height - 5) {
-            return 3;
-        }
-        if (y > height - 30) {
-            return 4;
-        }
-
-        return 7;
-    }
-
-    private makeGaussian(amplitude: number, x0: number, y0: number, sigmaX: number, sigmaY: number): (x: number, y: number) => number {
-        return function (x: number, y: number): number {
-            let exponent: number =
-                -(
-                    ( Math.pow(x - x0, 2) / (2 * Math.pow(sigmaX, 2)))
-                    + ( Math.pow(y - y0, 2) / (2 * Math.pow(sigmaY, 2)))
-                );
-
-            return amplitude * Math.pow(Math.E, exponent);
-        };
-    }
-}
-
-export class ColorVoxelor implements VoxelStrategy {
-    public constructor(private colorIndex: number) {
-
-    }
-
-    public generate(x: number, y: number, z: number): number {
-        return this.colorIndex;
-    }
-}
-
-export class GaussianVoxelor implements VoxelStrategy {
+export abstract class GaussianFalloffVoxelor implements VoxelStrategy {
     public constructor(private amplitude: number, private x0: number, private y0: number, private sigmaX: number, private sigmaY: number) {
     }
 
-    public generate(x: number, y: number, z: number): number {
-        if (y < this.calculateGassian(x, z) * 30) {
-            return 2;
-        }
+    public abstract generate(x: number, y: number, z: number): number;
 
-        return 0;
-    }
-
-    private calculateGassian(x: number, y: number): number {
+    protected calculateGassian(x: number, y: number): number {
         let exponent: number =
             -(
                 ( Math.pow(x - this.x0, 2) / (2 * Math.pow(this.sigmaX, 2)))
@@ -96,4 +49,46 @@ export class GaussianVoxelor implements VoxelStrategy {
 
         return this.amplitude * Math.pow(Math.E, exponent);
     };
+}
+
+export class GaussianVoxelor extends GaussianFalloffVoxelor {
+    public constructor(amplitude: number, x0: number, y0: number, sigmaX: number, sigmaY: number) {
+        super(amplitude, x0, y0, sigmaX, sigmaY);
+    }
+
+    public generate(x: number, y: number, z: number): number {
+        if (y < super.calculateGassian(x, z) * 30) {
+            return 2;
+        }
+
+        return 0;
+    }
+}
+
+export class MountainVoxelor extends GaussianFalloffVoxelor {
+    private landNoise: FastSimplexNoise = new FastSimplexNoise({octaves: 1, amplitude: 1, frequency: 0.025, persistence: 0.25} as Options);
+
+    public generate(x: number, y: number, z: number): number {
+
+        let landNoise: number = this.landNoise.scaled2D(x, z) + 1;
+        let falloff: number = super.calculateGassian(x, z);
+
+        let height: number = falloff * landNoise * 25;
+
+        if (y <= 0 && height <= 1) {
+            return 6;
+        }
+
+        if (y > height) {
+            return 0;
+        }
+        if (y > height - 5) {
+            return 3;
+        }
+        if (y > height - 10) {
+            return 4;
+        }
+
+        return 7;
+    }
 }

@@ -4,7 +4,7 @@
 import BABYLON = require('babylonjs/babylon.max');
 
 import { Chunk } from './chunk';
-import { SimplexNoise2DVoxelor, ColorVoxelor, SimplexNoiseVoxelor, GaussianVoxelor } from './voxelStrategy';
+import { MountainVoxelor } from './voxelStrategy';
 import { GreedMesher } from './meshStrategy';
 import { HexagonGrid } from './hexagonGrid';
 import { Hexagon } from './hexagon';
@@ -33,15 +33,27 @@ export class Game {
 
         this.standardMaterial = new BABYLON.StandardMaterial('standardMaterial', this.scene);
 
+        let centre: BABYLON.Vector2;
         this.grid = new HexagonGrid(3, 50);
-        this.grid.setHexagon(0, 0, new Hexagon(new SimplexNoise2DVoxelor()));
-        this.grid.setHexagon(1, 0, new Hexagon(new ColorVoxelor(1)));
-        this.grid.setHexagon(0, 1, new Hexagon(new SimplexNoiseVoxelor()));
-        let centre: BABYLON.Vector2 = this.grid.axialToPixel(-1, 1);
-        this.grid.setHexagon(-1, 1, new Hexagon(new GaussianVoxelor(0.5, centre.x, centre.y, 15, 15)));
-        this.grid.setHexagon(-1, 0, new Hexagon(new ColorVoxelor(3)));
-        this.grid.setHexagon(0, -1, new Hexagon(new ColorVoxelor(4)));
-        this.grid.setHexagon(1, -1, new Hexagon(new ColorVoxelor(5)));
+        this.grid.setHexagon(0, 0, new Hexagon(new MountainVoxelor(0.5, 0, 0, 15, 15)));
+
+        centre = this.grid.axialToPixel(1, 0);
+        this.grid.setHexagon(1, 0, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
+
+        centre = this.grid.axialToPixel(0, 1);
+        this.grid.setHexagon(0, 1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
+
+        centre = this.grid.axialToPixel(-1, 1);
+        this.grid.setHexagon(-1, 1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
+
+        centre = this.grid.axialToPixel(-1, 0);
+        this.grid.setHexagon(-1, 0, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
+
+        centre = this.grid.axialToPixel(0, -1);
+        this.grid.setHexagon(0, -1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
+
+        centre = this.grid.axialToPixel(1, -1);
+        this.grid.setHexagon(1, -1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
 
         this.addChunks();
     }
