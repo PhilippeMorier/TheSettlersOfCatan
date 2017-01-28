@@ -4,10 +4,8 @@
 import BABYLON = require('babylonjs/babylon.max');
 
 import { Chunk } from './chunk';
-import { MountainVoxelor } from './voxel/voxelStrategy';
 import { GreedMesher } from './mesh/meshStrategy';
 import { HexagonGrid } from './grid/hexagonGrid';
-import { Hexagon } from './grid/hexagon';
 
 export class Game {
     private engine: BABYLON.Engine;
@@ -33,27 +31,15 @@ export class Game {
 
         this.standardMaterial = new BABYLON.StandardMaterial('standardMaterial', this.scene);
 
-        let centre: BABYLON.Vector2;
+        // brick (Baustein), lumber (Holz), wool (Wolle), grain (Kor), and ore (Erz)
         this.grid = new HexagonGrid(3, 50);
-        this.grid.setHexagon(0, 0, new Hexagon(new MountainVoxelor(0.5, 0, 0, 15, 15)));
-
-        centre = this.grid.axialToPixel(1, 0);
-        this.grid.setHexagon(1, 0, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
-
-        centre = this.grid.axialToPixel(0, 1);
-        this.grid.setHexagon(0, 1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
-
-        centre = this.grid.axialToPixel(-1, 1);
-        this.grid.setHexagon(-1, 1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
-
-        centre = this.grid.axialToPixel(-1, 0);
-        this.grid.setHexagon(-1, 0, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
-
-        centre = this.grid.axialToPixel(0, -1);
-        this.grid.setHexagon(0, -1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
-
-        centre = this.grid.axialToPixel(1, -1);
-        this.grid.setHexagon(1, -1, new Hexagon(new MountainVoxelor(0.5, centre.x, centre.y, 15, 15)));
+        this.grid.addNewOreHexagonAt(0, 0);
+        this.grid.addNewOreHexagonAt(1, 0);
+        this.grid.addNewOreHexagonAt(0, 1);
+        this.grid.addNewOreHexagonAt(-1, 1);
+        this.grid.addNewOreHexagonAt(-1, 0);
+        this.grid.addNewOreHexagonAt(0, -1);
+        this.grid.addNewOreHexagonAt(1, -1);
 
         this.addChunks();
     }

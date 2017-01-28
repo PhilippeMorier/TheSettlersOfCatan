@@ -1,19 +1,13 @@
 import BABYLON = require('babylonjs/babylon.max');
 
 import { Hexagon } from './hexagon';
+import { VoxelStrategy, MountainVoxelor } from '../voxel/voxelStrategy';
 
 export class HexagonGrid {
     private hexagons: Hexagon[][] = [];
 
     public constructor(private radius: number, private edgeWidth: number) {
         this.initializeRows();
-    }
-
-    public axialToPixel(column: number, row: number): BABYLON.Vector2 {
-        let x: number = this.edgeWidth * Math.sqrt(3) * (column + row / 2);
-        let y: number = this.edgeWidth * 3 / 2 * row;
-
-        return new BABYLON.Vector2(x, y);
     }
 
     public getHexagon(column: number, row: number): Hexagon {
@@ -28,6 +22,16 @@ export class HexagonGrid {
         this.hexagons[index.x][index.y] = hexagon;
     }
 
+    public addNewOreHexagonAt(column: number, row: number): Hexagon {
+        let pixelPosition: BABYLON.Vector2 = this.axialToPixel(column, row);
+        let voxelor: VoxelStrategy = new MountainVoxelor(0.5, pixelPosition.x, pixelPosition.y, 15, 15);
+        let hexagon: Hexagon = new Hexagon(voxelor);
+
+        this.setHexagon(column, row, hexagon);
+
+        return hexagon;
+    }
+
     public getHexagonByPixel(x: number, y: number): Hexagon {
         let axial: BABYLON.Vector2 = this.pixelToAxial(x, y);
 
@@ -36,6 +40,13 @@ export class HexagonGrid {
 
     public pixelToAxial(x: number, y: number): BABYLON.Vector2 {
         return this.cubeToAxial(this.pixelToCube(x, y));
+    }
+
+    private axialToPixel(column: number, row: number): BABYLON.Vector2 {
+        let x: number = this.edgeWidth * Math.sqrt(3) * (column + row / 2);
+        let y: number = this.edgeWidth * 3 / 2 * row;
+
+        return new BABYLON.Vector2(x, y);
     }
 
     private cubeToAxial(cube: BABYLON.Vector3): BABYLON.Vector2 {
