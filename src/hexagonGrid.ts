@@ -1,4 +1,5 @@
 import BABYLON = require('babylonjs/babylon.max');
+
 import { Hexagon } from './hexagon';
 
 export class HexagonGrid {
